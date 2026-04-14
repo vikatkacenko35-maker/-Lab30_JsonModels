@@ -41,6 +41,31 @@ JsonSerializer.Serialize(hero, ourOptions), ourOptions),
             note = "Сравните имена полей и значений в двух разных вариантах"
 
         });
-        }
-    
+    }
+    [HttpGet("serialize")]
+    public ActionResult GetSerialize() {
+        var options = new JsonSerializerOptions {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
+        var hero = new Hero {
+            Id = 99,
+            Name = "Test Heto",
+            RealName = "Student",
+            Universe = Universe.Marvel,
+            PowerLevel = 50,
+            Powers = new() { "coding", "depugging" },
+            Weapon = new() { Name = "keyboard", IsRanged = false },
+            InternalNotes = "None"
+        };
+        string serialized = JsonSerializer.Serialize(hero, options);
+        var deserialized = JsonSerializer.Deserialize<Hero>(serialized, options);
+        return Ok(new {
+            serializedJson = serialized,
+            deserializedObject = deserialized,
+            internalNotesAfterDeserialize = deserialized?.InternalNotes ?? "null - поле было проигнорировано"
+        });
+    }
+
 }
